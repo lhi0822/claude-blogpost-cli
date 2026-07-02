@@ -60,5 +60,11 @@ export async function generateBlogPost(
     throw new Error('Gemini 응답에서 JSON을 추출할 수 없습니다.');
   }
 
-  return JSON.parse(match[0]) as BlogPost;
+  // Escape literal control characters inside JSON string values
+  const sanitized = match[0].replace(
+    /"(?:[^"\\]|\\.)*"/g,
+    (str) => str.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')
+  );
+
+  return JSON.parse(sanitized) as BlogPost;
 }
